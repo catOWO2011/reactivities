@@ -1,3 +1,4 @@
+using Application.Activities;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -21,6 +22,14 @@ builder.Services.AddDbContext<DataContext>(opt =>
 
     opt.UseNpgsql(connectionString);
 });
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+    });
+});
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
 
 var app = builder.Build();
 
@@ -30,6 +39,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
 
